@@ -104,18 +104,7 @@ contract MemoryPageFactRegistry is FactRegistry, MemoryPageFactRegistryConstants
             )
         }
 
-        factHash = keccak256(
-            abi.encodePacked(
-                REGULAR_PAGE,
-                prime,
-                memorySize,
-                z,
-                alpha,
-                prod,
-                memoryHash,
-                uint256(0)
-            )
-        );
+        factHash = keccak256(abi.encodePacked(REGULAR_PAGE, prime, memorySize, z, alpha, prod, memoryHash, uint256(0)));
     }
 
     /*
@@ -168,10 +157,7 @@ contract MemoryPageFactRegistry is FactRegistry, MemoryPageFactRegistryConstants
                     prod,
                     mulmod(
                         add(add(sub(addr, 7), mulmod(mload(valuesPtr), alpha, prime)), minus_z),
-                        add(
-                            add(sub(addr, 6), mulmod(mload(add(valuesPtr, 0x20)), alpha, prime)),
-                            minus_z
-                        ),
+                        add(add(sub(addr, 6), mulmod(mload(add(valuesPtr, 0x20)), alpha, prime)), minus_z),
                         prime
                     ),
                     prime
@@ -180,14 +166,8 @@ contract MemoryPageFactRegistry is FactRegistry, MemoryPageFactRegistryConstants
                 prod := mulmod(
                     prod,
                     mulmod(
-                        add(
-                            add(sub(addr, 5), mulmod(mload(add(valuesPtr, 0x40)), alpha, prime)),
-                            minus_z
-                        ),
-                        add(
-                            add(sub(addr, 4), mulmod(mload(add(valuesPtr, 0x60)), alpha, prime)),
-                            minus_z
-                        ),
+                        add(add(sub(addr, 5), mulmod(mload(add(valuesPtr, 0x40)), alpha, prime)), minus_z),
+                        add(add(sub(addr, 4), mulmod(mload(add(valuesPtr, 0x60)), alpha, prime)), minus_z),
                         prime
                     ),
                     prime
@@ -196,14 +176,8 @@ contract MemoryPageFactRegistry is FactRegistry, MemoryPageFactRegistryConstants
                 prod := mulmod(
                     prod,
                     mulmod(
-                        add(
-                            add(sub(addr, 3), mulmod(mload(add(valuesPtr, 0x80)), alpha, prime)),
-                            minus_z
-                        ),
-                        add(
-                            add(sub(addr, 2), mulmod(mload(add(valuesPtr, 0xa0)), alpha, prime)),
-                            minus_z
-                        ),
+                        add(add(sub(addr, 3), mulmod(mload(add(valuesPtr, 0x80)), alpha, prime)), minus_z),
+                        add(add(sub(addr, 2), mulmod(mload(add(valuesPtr, 0xa0)), alpha, prime)), minus_z),
                         prime
                     ),
                     prime
@@ -212,10 +186,7 @@ contract MemoryPageFactRegistry is FactRegistry, MemoryPageFactRegistryConstants
                 prod := mulmod(
                     prod,
                     mulmod(
-                        add(
-                            add(sub(addr, 1), mulmod(mload(add(valuesPtr, 0xc0)), alpha, prime)),
-                            minus_z
-                        ),
+                        add(add(sub(addr, 1), mulmod(mload(add(valuesPtr, 0xc0)), alpha, prime)), minus_z),
                         add(add(addr, mulmod(mload(add(valuesPtr, 0xe0)), alpha, prime)), minus_z),
                         prime
                     ),
@@ -233,11 +204,7 @@ contract MemoryPageFactRegistry is FactRegistry, MemoryPageFactRegistryConstants
             } lt(addr, lastAddr) {
                 addr := add(addr, 1)
             } {
-                let address_value_lin_comb := addmod(
-                    addr,
-                    mulmod(mload(valuesPtr), alpha, prime),
-                    prime
-                )
+                let address_value_lin_comb := addmod(addr, mulmod(mload(valuesPtr), alpha, prime), prime)
                 prod := mulmod(prod, add(z, sub(prime, address_value_lin_comb)), prime)
                 valuesPtr := add(valuesPtr, 0x20)
             }
@@ -245,9 +212,7 @@ contract MemoryPageFactRegistry is FactRegistry, MemoryPageFactRegistryConstants
             memoryHash := keccak256(add(values, 0x20), mul(0x20, nValues))
         }
 
-        factHash = keccak256(
-            abi.encodePacked(CONTINUOUS_PAGE, prime, nValues, z, alpha, prod, memoryHash, startAddr)
-        );
+        factHash = keccak256(abi.encodePacked(CONTINUOUS_PAGE, prime, nValues, z, alpha, prod, memoryHash, startAddr));
 
         emit LogMemoryPageFactContinuous(factHash, memoryHash, prod);
 

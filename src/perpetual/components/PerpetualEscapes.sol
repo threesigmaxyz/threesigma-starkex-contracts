@@ -40,9 +40,7 @@ abstract contract PerpetualEscapes is PerpetualStorage, MAcceptModifications, MF
         escapesUsed[vaultId] = true;
         escapesUsedCount += 1;
 
-        bytes32 claimHash = keccak256(
-            abi.encode(starkKey, quantizedAmount, sharedStateHash, vaultId)
-        );
+        bytes32 claimHash = keccak256(abi.encode(starkKey, quantizedAmount, sharedStateHash, vaultId));
         IFactRegistry escapeVerifier = IFactRegistry(escapeVerifierAddress);
         require(escapeVerifier.isValid(claimHash), "ESCAPE_LACKS_PROOF");
 

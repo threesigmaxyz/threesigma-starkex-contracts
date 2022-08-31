@@ -3,9 +3,9 @@
   "plugins": ["prettier"],
   "rules": {
     "code-complexity": ["error", 8],
-    "compiler-version": ["error", ">=0.8.4"],
+    "compiler-version": ["error", ">=0.6.12"],
     "func-visibility": ["error", { "ignoreConstructors": true }],
-    "max-line-length": ["error", 120],
+    "max-line-length": ["error", 600],
     "not-rely-on-time": "off",
     "prettier/prettier": [
       "error",

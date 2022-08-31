@@ -12,11 +12,7 @@ import "../../libraries/LibConstants.sol";
   This contract is an external initializing contract that replaces the escape verifier used by
   the main contract.
 */
-contract ReplaceEscapeVerifierExternalInitializer is
-    ExternalInitializer,
-    MainStorage,
-    LibConstants
-{
+contract ReplaceEscapeVerifierExternalInitializer is ExternalInitializer, MainStorage, LibConstants {
     using Addresses for address;
 
     /*
@@ -28,15 +24,10 @@ contract ReplaceEscapeVerifierExternalInitializer is
         require(data.length == 64, "UNEXPECTED_DATA_SIZE");
 
         // Extract sub-contract address and hash of verifierId.
-        (address newEscapeVerifierAddress, bytes32 escapeVerifierIdHash) = abi.decode(
-            data,
-            (address, bytes32)
-        );
+        (address newEscapeVerifierAddress, bytes32 escapeVerifierIdHash) = abi.decode(data, (address, bytes32));
 
         require(newEscapeVerifierAddress.isContract(), "ADDRESS_NOT_CONTRACT");
-        bytes32 contractIdHash = keccak256(
-            abi.encodePacked(Identity(newEscapeVerifierAddress).identify())
-        );
+        bytes32 contractIdHash = keccak256(abi.encodePacked(Identity(newEscapeVerifierAddress).identify()));
         require(contractIdHash == escapeVerifierIdHash, "UNEXPECTED_CONTRACT_IDENTIFIER");
 
         // Replace the escape verifier address in storage.

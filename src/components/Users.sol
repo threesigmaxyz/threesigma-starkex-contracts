@@ -70,9 +70,7 @@ abstract contract Users is MainStorage, LibConstants {
         bytes memory sig = starkSignature;
         (uint256 r, uint256 s, uint256 StarkKeyY) = abi.decode(sig, (uint256, uint256, uint256));
 
-        uint256 msgHash = uint256(
-            keccak256(abi.encodePacked("UserRegistration:", ethKey, starkKey))
-        ) % ECDSA.EC_ORDER;
+        uint256 msgHash = uint256(keccak256(abi.encodePacked("UserRegistration:", ethKey, starkKey))) % ECDSA.EC_ORDER;
 
         ECDSA.verify(msgHash, r, s, starkKey, StarkKeyY);
 

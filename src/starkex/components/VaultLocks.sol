@@ -11,12 +11,7 @@ import "../../interfaces/MGovernance.sol";
 */
 abstract contract VaultLocks is StarkExStorage, StarkExConstants, MGovernance, MVaultLocks {
     event LogDefaultVaultWithdrawalLockSet(uint256 newDefaultLockTime);
-    event LogVaultWithdrawalLockSet(
-        address ethKey,
-        uint256 assetId,
-        uint256 vaultId,
-        uint256 timeRelease
-    );
+    event LogVaultWithdrawalLockSet(address ethKey, uint256 assetId, uint256 vaultId, uint256 timeRelease);
 
     function initialize(uint256 defaultLockTime) internal {
         setDefaultVaultWithdrawalLock(defaultLockTime);

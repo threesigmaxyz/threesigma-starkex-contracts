@@ -11,8 +11,7 @@ contract ModifyUpgradeDelayExternalInitializer is ExternalInitializer {
     uint256 constant MAX_DELAY = 28 days;
 
     // Web3.solidityKeccak(['string'], ['StarkWare.Upgradibility.Delay.Slot']).
-    bytes32 constant UPGRADE_DELAY_SLOT =
-        0xc21dbb3089fcb2c4f4c6a67854ab4db2b0f233ea4b21b21f912d52d18fc5db1f;
+    bytes32 constant UPGRADE_DELAY_SLOT = 0xc21dbb3089fcb2c4f4c6a67854ab4db2b0f233ea4b21b21f912d52d18fc5db1f;
 
     function initialize(bytes calldata data) external virtual override {
         require(data.length == 32, "INCORRECT_INIT_DATA_SIZE_32");

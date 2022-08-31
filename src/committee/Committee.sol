@@ -42,10 +42,7 @@ contract Committee is FactRegistry, IAvailabilityVerifier, Identity {
     /// The format is keccak256(abi.encodePacked(
     ///    newValidiumVaultRoot, validiumTreeHeight, newOrderRoot, orderTreeHeight sequenceNumber))
     /// @param availabilityProofs Concatenated ec signatures by committee members.
-    function verifyAvailabilityProof(bytes32 claimHash, bytes calldata availabilityProofs)
-        external
-        override
-    {
+    function verifyAvailabilityProof(bytes32 claimHash, bytes calldata availabilityProofs) external override {
         require(
             availabilityProofs.length >= signaturesRequired * SIGNATURE_LENGTH,
             "INVALID_AVAILABILITY_PROOF_LENGTH"
@@ -68,11 +65,7 @@ contract Committee is FactRegistry, IAvailabilityVerifier, Identity {
         registerFact(claimHash);
     }
 
-    function bytesToBytes32(bytes memory array, uint256 offset)
-        private
-        pure
-        returns (bytes32 result)
-    {
+    function bytesToBytes32(bytes memory array, uint256 offset) private pure returns (bytes32 result) {
         // Arrays are prefixed by a 256 bit length parameter.
         uint256 actualOffset = offset + 32;
 

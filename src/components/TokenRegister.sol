@@ -81,7 +81,8 @@ abstract contract TokenRegister is MainStorage, LibConstants, MGovernance, MToke
         uint256 assetType,
         bytes calldata assetInfo,
         uint256 quantum
-    ) public virtual { // TODO onlyTokenAdmin
+    ) public virtual {
+        // TODO onlyTokenAdmin
         // Make sure it is not invalid or already registered.
         require(!isAssetRegistered(assetType), "ASSET_ALREADY_REGISTERED");
         require(assetType < K_MODULUS, "INVALID_ASSET_TYPE");

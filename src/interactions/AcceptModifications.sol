@@ -10,12 +10,7 @@ import "../components/MainStorage.sol";
   Interface containing actions a verifier can invoke on the state.
   The contract containing the state should implement these and verify correctness.
 */
-abstract contract AcceptModifications is
-    MainStorage,
-    LibConstants,
-    MAcceptModifications,
-    MTokenQuantization
-{
+abstract contract AcceptModifications is MainStorage, LibConstants, MAcceptModifications, MTokenQuantization {
     event LogWithdrawalAllowed(
         uint256 ownerKey,
         uint256 assetType,
@@ -40,10 +35,7 @@ abstract contract AcceptModifications is
         uint256 quantizedAmount
     ) internal virtual override {
         // Fetch deposit.
-        require(
-            pendingDeposits[ownerKey][assetId][vaultId] >= quantizedAmount,
-            "DEPOSIT_INSUFFICIENT"
-        );
+        require(pendingDeposits[ownerKey][assetId][vaultId] >= quantizedAmount, "DEPOSIT_INSUFFICIENT");
 
         // Subtract accepted quantized amount.
         pendingDeposits[ownerKey][assetId][vaultId] -= quantizedAmount;

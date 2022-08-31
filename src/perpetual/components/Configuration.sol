@@ -64,10 +64,7 @@ abstract contract Configuration is PerpetualStorage, PerpetualConstants, MGovern
     /*
       Register an asset configuration hash, for applying once configuration delay time-lock expires.
     */
-    function registerAssetConfigurationChange(uint256 assetId, bytes32 configHash)
-        external
-        onlyGovernance
-    {
+    function registerAssetConfigurationChange(uint256 assetId, bytes32 configHash) external onlyGovernance {
         require(assetId < PERPETUAL_ASSET_ID_UPPER_BOUND, "INVALID_ASSET_ID");
         require(uint256(configHash) < K_MODULUS, "INVALID_CONFIG_HASH");
         bytes32 actionKey = keccak256(abi.encode(assetId, configHash));
@@ -78,10 +75,7 @@ abstract contract Configuration is PerpetualStorage, PerpetualConstants, MGovern
     /*
       Applies asset configuration hash.
     */
-    function applyAssetConfigurationChange(uint256 assetId, bytes32 configHash)
-        external
-        onlyGovernance
-    {
+    function applyAssetConfigurationChange(uint256 assetId, bytes32 configHash) external onlyGovernance {
         bytes32 actionKey = keccak256(abi.encode(assetId, configHash));
         uint256 activationTime = actionsTimeLock[actionKey];
         require(activationTime > 0, "CONFIGURATION_NOT_REGSITERED");
@@ -90,10 +84,7 @@ abstract contract Configuration is PerpetualStorage, PerpetualConstants, MGovern
         emit LogAssetConfigurationApplied(assetId, configHash);
     }
 
-    function removeAssetConfigurationChange(uint256 assetId, bytes32 configHash)
-        external
-        onlyGovernance
-    {
+    function removeAssetConfigurationChange(uint256 assetId, bytes32 configHash) external onlyGovernance {
         bytes32 actionKey = keccak256(abi.encode(assetId, configHash));
         require(actionsTimeLock[actionKey] > 0, "CONFIGURATION_NOT_REGSITERED");
         delete actionsTimeLock[actionKey];

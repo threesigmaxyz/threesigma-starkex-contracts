@@ -15,7 +15,7 @@ library Addresses {
     }
 
     function performEthTransfer(address recipient, uint256 amount) internal {
-        (bool success, ) = recipient.call{value: amount}(""); // NOLINT: low-level-calls.
+        (bool success, ) = recipient.call{ value: amount }(""); // NOLINT: low-level-calls.
         require(success, "ETH_TRANSFER_FAILED");
     }
 
@@ -41,15 +41,10 @@ library Addresses {
     */
     function validateContractId(address contractAddress, bytes32 expectedIdHash) internal {
         require(isContract(contractAddress), "ADDRESS_NOT_CONTRACT");
-        (bool success, bytes memory returndata) = contractAddress.call( // NOLINT: low-level-calls.
-            abi.encodeWithSignature("identify()")
-        );
+        (bool success, bytes memory returndata) = contractAddress.call(abi.encodeWithSignature("identify()")); // NOLINT: low-level-calls.
         require(success, "FAILED_TO_IDENTIFY_CONTRACT");
         string memory realContractId = abi.decode(returndata, (string));
-        require(
-            keccak256(abi.encodePacked(realContractId)) == expectedIdHash,
-            "UNEXPECTED_CONTRACT_IDENTIFIER"
-        );
+        require(keccak256(abi.encodePacked(realContractId)) == expectedIdHash, "UNEXPECTED_CONTRACT_IDENTIFIER");
     }
 }
 

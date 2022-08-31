@@ -24,13 +24,7 @@ import "../../interfaces/MStateRoot.sol";
   exchange operator, for example), only the owner of the vault may perform the final step of
   transferring the funds.
 */
-abstract contract Escapes is
-    MainStorage,
-    LibConstants,
-    MAcceptModifications,
-    MFreezable,
-    MStateRoot
-{
+abstract contract Escapes is MainStorage, LibConstants, MAcceptModifications, MFreezable, MStateRoot {
     function initialize(address escapeVerifier) internal {
         escapeVerifierAddress = escapeVerifier;
     }
@@ -62,9 +56,7 @@ abstract contract Escapes is
         // The index of vaultId leaf in its tree doesn't include the rollup bit flag.
         uint256 vaultLeafIndex = (vaultId & (2**ROLLUP_VAULTS_BIT - 1));
 
-        bytes32 claimHash = keccak256(
-            abi.encode(ownerKey, assetId, quantizedAmount, root, treeHeight, vaultLeafIndex)
-        );
+        bytes32 claimHash = keccak256(abi.encode(ownerKey, assetId, quantizedAmount, root, treeHeight, vaultLeafIndex));
         IFactRegistry escapeVerifier = IFactRegistry(escapeVerifierAddress);
         require(escapeVerifier.isValid(claimHash), "ESCAPE_LACKS_PROOF");
 

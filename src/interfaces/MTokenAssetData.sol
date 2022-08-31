@@ -25,11 +25,7 @@ abstract contract MTokenAssetData {
 
     function isNonFungibleAssetInfo(bytes memory assetInfo) internal pure virtual returns (bool);
 
-    function calculateAssetIdWithTokenId(uint256 assetType, uint256 tokenId)
-        public
-        view
-        virtual
-        returns (uint256);
+    function calculateAssetIdWithTokenId(uint256 assetType, uint256 tokenId) public view virtual returns (uint256);
 
     function calculateMintableAssetId(uint256 assetType, bytes memory mintingBlob)
         public

@@ -31,11 +31,7 @@ import "./MainStorage.sol";
   to leave the exchange.
 */
 abstract contract AvailabilityVerifiers is MainStorage, LibConstants, MApprovalChain {
-    function getRegisteredAvailabilityVerifiers()
-        external
-        view
-        returns (address[] memory _verifers)
-    {
+    function getRegisteredAvailabilityVerifiers() external view returns (address[] memory _verifers) {
         return availabilityVerifiersChain.list;
     }
 
