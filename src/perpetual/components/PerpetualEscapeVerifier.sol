@@ -15,18 +15,8 @@ import "../ProgramOutputOffsets.sol";
     keccak256(abi.encodePacked(
         publicKey, withdrawalAmount, sharedStateHash, positionId).
 */
-contract PerpetualEscapeVerifier is
-    PedersenMerkleVerifier,
-    FactRegistry,
-    Identity,
-    ProgramOutputOffsets
-{
-    event LogEscapeVerified(
-        uint256 publicKey,
-        int256 withdrawalAmount,
-        bytes32 sharedStateHash,
-        uint256 positionId
-    );
+contract PerpetualEscapeVerifier is PedersenMerkleVerifier, FactRegistry, Identity, ProgramOutputOffsets {
+    event LogEscapeVerified(uint256 publicKey, int256 withdrawalAmount, bytes32 sharedStateHash, uint256 positionId);
 
     uint256 internal constant N_ASSETS_BITS = 16;
     uint256 internal constant BALANCE_BITS = 64;
@@ -72,11 +62,7 @@ contract PerpetualEscapeVerifier is
          assedId << 128 | cachedFunding << BALANCE_BITS | biased_asset_balance.
 
     */
-    function computeFxpBalance(uint256[] memory position, uint256[] memory sharedState)
-        internal
-        pure
-        returns (int256)
-    {
+    function computeFxpBalance(uint256[] memory position, uint256[] memory sharedState) internal pure returns (int256) {
         uint256 nAssets;
         uint256 fxpBalance;
 
@@ -115,15 +101,8 @@ contract PerpetualEscapeVerifier is
             uint256 cachedFunding = (positionAsset >> BALANCE_BITS) & (2**FUNDING_BITS - 1);
             uint256 assetBalance = (positionAsset & (2**BALANCE_BITS - 1)) - BALANCE_BIAS;
 
-            fundingIndicesOffset = findAssetId(
-                assedId,
-                sharedStateCopy,
-                fundingIndicesOffset,
-                fundingEnd
-            );
-            fundingTotal -=
-                assetBalance *
-                (sharedStateCopy[fundingIndicesOffset + 1] - cachedFunding);
+            fundingIndicesOffset = findAssetId(assedId, sharedStateCopy, fundingIndicesOffset, fundingEnd);
+            fundingTotal -= assetBalance * (sharedStateCopy[fundingIndicesOffset + 1] - cachedFunding);
 
             pricesOffset = findAssetId(assedId, sharedStateCopy, pricesOffset, pricesEnd);
             fxpBalance += assetBalance * sharedStateCopy[pricesOffset + 1];
@@ -156,10 +135,7 @@ contract PerpetualEscapeVerifier is
         uint256 nodeIdx = merkleProof[merkleProof.length - 1] >> 8;
 
         // Check that the merkleProof starts with a hash_chain of 'positionLength' elements.
-        require(
-            (nodeIdx & ((1 << positionLength) - 1)) == 0,
-            "merkleProof is inconsistent with nAssets."
-        );
+        require((nodeIdx & ((1 << positionLength) - 1)) == 0, "merkleProof is inconsistent with nAssets.");
         positionId = nodeIdx >> positionLength;
 
         assembly {
@@ -174,10 +150,7 @@ contract PerpetualEscapeVerifier is
             } {
                 mstore(
                     positionPtr,
-                    and(
-                        mload(proofPtr),
-                        0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-                    )
+                    and(mload(proofPtr), 0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
                 )
                 proofPtr := add(proofPtr, 0x40)
             }
@@ -225,9 +198,7 @@ contract PerpetualEscapeVerifier is
 
         uint256 publicKey = position[nAssets];
         emit LogEscapeVerified(publicKey, withdrawalAmount, sharedStateHash, positionId);
-        bytes32 fact = keccak256(
-            abi.encodePacked(publicKey, withdrawalAmount, sharedStateHash, positionId)
-        );
+        bytes32 fact = keccak256(abi.encodePacked(publicKey, withdrawalAmount, sharedStateHash, positionId));
 
         verifyMerkle(merkleProof);
 

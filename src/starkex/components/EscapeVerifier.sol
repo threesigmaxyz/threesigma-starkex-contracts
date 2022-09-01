@@ -180,16 +180,7 @@ contract EscapeVerifier is IFactRegistry {
             } lt(i, 63) {
                 i := add(i, 1)
             } {
-                if iszero(
-                    staticcall(
-                        gas(),
-                        sload(i),
-                        add(proof, i),
-                        rowSize,
-                        add(table, mul(i, rowSize)),
-                        rowSize
-                    )
-                ) {
+                if iszero(staticcall(gas(), sload(i), add(proof, i), rowSize, add(table, mul(i, rowSize)), rowSize)) {
                     returndatacopy(0, 0, returndatasize())
                     revert(0, returndatasize())
                 }
@@ -318,10 +309,7 @@ contract EscapeVerifier is IFactRegistry {
             mstore(0x20, assetId)
             mstore(
                 0x40, // quantizedAmount
-                and(
-                    mload(add(proof, 0x5f)),
-                    0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-                )
+                and(mload(add(proof, 0x5f)), 0x0fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff)
             )
             mstore(0x60, shr(4, mload(add(proof, rowSize)))) // vaultRoot
             mstore(0x80, height)

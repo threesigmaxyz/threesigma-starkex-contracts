@@ -35,10 +35,7 @@ abstract contract TokenTransfers is MTokenQuantization, MTokenAssetData, MTokenT
             uint256 exchangeBalanceAfter = token.balanceOf(address(this));
             require(exchangeBalanceAfter >= exchangeBalanceBefore, "OVERFLOW");
             // NOLINTNEXTLINE(incorrect-equality): strict equality needed.
-            require(
-                exchangeBalanceAfter == exchangeBalanceBefore + amount,
-                "INCORRECT_AMOUNT_TRANSFERRED"
-            );
+            require(exchangeBalanceAfter == exchangeBalanceBefore + amount, "INCORRECT_AMOUNT_TRANSFERRED");
         } else if (isEther(assetType)) {
             require(msg.value == amount, "INCORRECT_DEPOSIT_AMOUNT");
         } else {
@@ -69,12 +66,7 @@ abstract contract TokenTransfers is MTokenQuantization, MTokenAssetData, MTokenT
         address tokenAddress = extractContractAddress(assetType);
 
         tokenAddress.safeTokenContractCall(
-            abi.encodeWithSignature(
-                "safeTransferFrom(address,address,uint256)",
-                msg.sender,
-                address(this),
-                tokenId
-            )
+            abi.encodeWithSignature("safeTransferFrom(address,address,uint256)", msg.sender, address(this), tokenId)
         );
     }
 
@@ -106,10 +98,7 @@ abstract contract TokenTransfers is MTokenQuantization, MTokenAssetData, MTokenT
         uint256 exchangeBalanceAfter = token.balanceOf(address(this), tokenId);
         require(exchangeBalanceAfter >= exchangeBalanceBefore, "OVERFLOW");
         // NOLINTNEXTLINE(incorrect-equality): strict equality needed.
-        require(
-            exchangeBalanceAfter == exchangeBalanceBefore + amount,
-            "INCORRECT_AMOUNT_TRANSFERRED"
-        );
+        require(exchangeBalanceAfter == exchangeBalanceBefore + amount, "INCORRECT_AMOUNT_TRANSFERRED");
     }
 
     /*
@@ -128,19 +117,12 @@ abstract contract TokenTransfers is MTokenQuantization, MTokenAssetData, MTokenT
             address tokenAddress = extractContractAddress(assetType);
             IERC20 token = IERC20(tokenAddress);
             uint256 exchangeBalanceBefore = token.balanceOf(address(this));
-            bytes memory callData = abi.encodeWithSelector(
-                token.transfer.selector,
-                recipient,
-                amount
-            );
+            bytes memory callData = abi.encodeWithSelector(token.transfer.selector, recipient, amount);
             tokenAddress.safeTokenContractCall(callData);
             uint256 exchangeBalanceAfter = token.balanceOf(address(this));
             require(exchangeBalanceAfter <= exchangeBalanceBefore, "UNDERFLOW");
             // NOLINTNEXTLINE(incorrect-equality): strict equality needed.
-            require(
-                exchangeBalanceAfter == exchangeBalanceBefore - amount,
-                "INCORRECT_AMOUNT_TRANSFERRED"
-            );
+            require(exchangeBalanceAfter == exchangeBalanceBefore - amount, "INCORRECT_AMOUNT_TRANSFERRED");
         } else if (isEther(assetType)) {
             if (quantizedAmount == 0) return;
             recipient.performEthTransfer(amount);
@@ -181,12 +163,7 @@ abstract contract TokenTransfers is MTokenQuantization, MTokenAssetData, MTokenT
         address tokenAddress = extractContractAddress(assetType);
 
         tokenAddress.safeTokenContractCall(
-            abi.encodeWithSignature(
-                "safeTransferFrom(address,address,uint256)",
-                address(this),
-                recipient,
-                tokenId
-            )
+            abi.encodeWithSignature("safeTransferFrom(address,address,uint256)", address(this), recipient, tokenId)
         );
     }
 
@@ -224,10 +201,7 @@ abstract contract TokenTransfers is MTokenQuantization, MTokenAssetData, MTokenT
         uint256 exchangeBalanceAfter = token.balanceOf(address(this), tokenId);
         require(exchangeBalanceAfter <= exchangeBalanceBefore, "UNDERFLOW");
         // NOLINTNEXTLINE(incorrect-equality): strict equality needed.
-        require(
-            exchangeBalanceAfter == exchangeBalanceBefore - amount,
-            "INCORRECT_AMOUNT_TRANSFERRED"
-        );
+        require(exchangeBalanceAfter == exchangeBalanceBefore - amount, "INCORRECT_AMOUNT_TRANSFERRED");
     }
 
     function transferOutMint(
@@ -243,12 +217,7 @@ abstract contract TokenTransfers is MTokenQuantization, MTokenAssetData, MTokenT
         uint256 amount = fromQuantized(assetType, quantizedAmount);
         address tokenAddress = extractContractAddress(assetType);
         tokenAddress.safeTokenContractCall(
-            abi.encodeWithSignature(
-                "mintFor(address,uint256,bytes)",
-                recipient,
-                amount,
-                mintingBlob
-            )
+            abi.encodeWithSignature("mintFor(address,uint256,bytes)", recipient, amount, mintingBlob)
         );
     }
 }

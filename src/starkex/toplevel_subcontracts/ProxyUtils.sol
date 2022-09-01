@@ -7,10 +7,7 @@ import "../../upgrade/ProxyStorage.sol";
 import "../../upgrade/StorageSlots.sol";
 
 contract ProxyUtils is SubContractor, StorageSlots, ProxyGovernance, ProxyStorage {
-    event ImplementationActivationRescheduled(
-        address indexed implementation,
-        uint256 updatedActivationTime
-    );
+    event ImplementationActivationRescheduled(address indexed implementation, uint256 updatedActivationTime);
 
     function initialize(
         bytes calldata /* data */
@@ -39,10 +36,7 @@ contract ProxyUtils is SubContractor, StorageSlots, ProxyGovernance, ProxyStorag
 
         // We assume the Proxy is of the old format.
         bytes32 oldFormatInitHash = keccak256(abi.encode(data, finalize));
-        require(
-            initializationHash_DEPRECATED[implementation] == oldFormatInitHash,
-            "IMPLEMENTATION_NOT_PENDING"
-        );
+        require(initializationHash_DEPRECATED[implementation] == oldFormatInitHash, "IMPLEMENTATION_NOT_PENDING");
 
         // Converting address to bytes32 to match the mapping key type.
         bytes32 implementationKey;
@@ -55,10 +49,7 @@ contract ProxyUtils is SubContractor, StorageSlots, ProxyGovernance, ProxyStorag
 
         // Current value is checked to be within a reasonable delay. If it's over 6 months from now,
         // it's assumed that the activation time is configured under a different set of rules.
-        require(
-            pendingActivationTime < block.timestamp + 180 days,
-            "INVALID_PENDING_ACTIVATION_TIME"
-        );
+        require(pendingActivationTime < block.timestamp + 180 days, "INVALID_PENDING_ACTIVATION_TIME");
 
         if (updatedActivationTime < pendingActivationTime) {
             enabledTime[implementationKey] = updatedActivationTime;

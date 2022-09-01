@@ -26,20 +26,12 @@ abstract contract MApprovalChain {
       Returns the index of the verifier in the list if it exists and returns ENTRY_NOT_FOUND
       otherwise.
     */
-    function findEntry(address[] storage list, address entry)
-        internal
-        view
-        virtual
-        returns (uint256);
+    function findEntry(address[] storage list, address entry) internal view virtual returns (uint256);
 
     /*
       Same as findEntry(), except that it reverts if the verifier is not found.
     */
-    function safeFindEntry(address[] storage list, address entry)
-        internal
-        view
-        virtual
-        returns (uint256 idx);
+    function safeFindEntry(address[] storage list, address entry) internal view virtual returns (uint256 idx);
 
     /*
       Updates the unlockedForRemovalTime field of the given verifier to
@@ -55,7 +47,5 @@ abstract contract MApprovalChain {
     /*
       Removes a verifier assuming the expected time has passed.
     */
-    function removeEntry(StarkExTypes.ApprovalChainData storage chain, address entry)
-        internal
-        virtual;
+    function removeEntry(StarkExTypes.ApprovalChainData storage chain, address entry) internal virtual;
 }

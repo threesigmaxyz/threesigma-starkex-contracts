@@ -16,20 +16,14 @@ abstract contract MainDispatcher is MainStorage, MainDispatcherBase {
     function validateSubContractIndex(uint256 index, address subContract) internal pure override {
         string memory id = SubContractor(subContract).identify();
         bytes32 hashed_expected_id = keccak256(abi.encodePacked(expectedIdByIndex(index)));
-        require(
-            hashed_expected_id == keccak256(abi.encodePacked(id)),
-            "MISPLACED_INDEX_OR_BAD_CONTRACT_ID"
-        );
+        require(hashed_expected_id == keccak256(abi.encodePacked(id)), "MISPLACED_INDEX_OR_BAD_CONTRACT_ID");
 
         // Gets the list of critical selectors from the sub-contract and checks that the selector
         // is mapped to that sub-contract.
         bytes4[] memory selectorsToValidate = SubContractor(subContract).validatedSelectors();
 
         for (uint256 i = 0; i < selectorsToValidate.length; i++) {
-            require(
-                getSubContractIndex(selectorsToValidate[i]) == index,
-                "INCONSISTENT_DISPATCHER_MAP"
-            );
+            require(getSubContractIndex(selectorsToValidate[i]) == index, "INCONSISTENT_DISPATCHER_MAP");
         }
     }
 

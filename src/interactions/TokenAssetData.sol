@@ -11,10 +11,8 @@ contract TokenAssetData is MainStorage, LibConstants, MTokenAssetData {
     bytes4 internal constant ETH_SELECTOR = bytes4(keccak256("ETH()"));
     bytes4 internal constant ERC721_SELECTOR = bytes4(keccak256("ERC721Token(address,uint256)"));
     bytes4 internal constant ERC1155_SELECTOR = bytes4(keccak256("ERC1155Token(address,uint256)"));
-    bytes4 internal constant MINTABLE_ERC20_SELECTOR =
-        bytes4(keccak256("MintableERC20Token(address)"));
-    bytes4 internal constant MINTABLE_ERC721_SELECTOR =
-        bytes4(keccak256("MintableERC721Token(address,uint256)"));
+    bytes4 internal constant MINTABLE_ERC20_SELECTOR = bytes4(keccak256("MintableERC20Token(address)"));
+    bytes4 internal constant MINTABLE_ERC721_SELECTOR = bytes4(keccak256("MintableERC721Token(address,uint256)"));
 
     // The selector follows the 0x20 bytes assetInfo.length field.
     uint256 internal constant SELECTOR_OFFSET = 0x20;
@@ -32,11 +30,7 @@ contract TokenAssetData is MainStorage, LibConstants, MTokenAssetData {
       Works like bytes4 tokenSelector = abi.decode(assetInfo, (bytes4))
       but does not revert when assetInfo.length < SELECTOR_OFFSET.
     */
-    function extractTokenSelectorFromAssetInfo(bytes memory assetInfo)
-        private
-        pure
-        returns (bytes4 selector)
-    {
+    function extractTokenSelectorFromAssetInfo(bytes memory assetInfo) private pure returns (bytes4 selector) {
         assembly {
             selector := and(
                 0xffffffff00000000000000000000000000000000000000000000000000000000,
@@ -83,8 +77,7 @@ contract TokenAssetData is MainStorage, LibConstants, MTokenAssetData {
 
     function isMintableAssetType(uint256 assetType) internal view override returns (bool) {
         bytes4 tokenSelector = extractTokenSelectorFromAssetType(assetType);
-        return
-            tokenSelector == MINTABLE_ERC20_SELECTOR || tokenSelector == MINTABLE_ERC721_SELECTOR;
+        return tokenSelector == MINTABLE_ERC20_SELECTOR || tokenSelector == MINTABLE_ERC721_SELECTOR;
     }
 
     function isAssetTypeWithTokenId(uint256 assetType) internal view override returns (bool) {
@@ -102,11 +95,7 @@ contract TokenAssetData is MainStorage, LibConstants, MTokenAssetData {
             tokenSelector == ERC1155_SELECTOR;
     }
 
-    function extractContractAddressFromAssetInfo(bytes memory assetInfo)
-        private
-        pure
-        returns (address)
-    {
+    function extractContractAddressFromAssetInfo(bytes memory assetInfo) private pure returns (address) {
         uint256 offset = TOKEN_CONTRACT_ADDRESS_OFFSET;
         uint256 res;
         assembly {
@@ -143,12 +132,7 @@ contract TokenAssetData is MainStorage, LibConstants, MTokenAssetData {
         return tokenSelector == ERC721_SELECTOR || tokenSelector == MINTABLE_ERC721_SELECTOR;
     }
 
-    function calculateAssetIdWithTokenId(uint256 assetType, uint256 tokenId)
-        public
-        view
-        override
-        returns (uint256)
-    {
+    function calculateAssetIdWithTokenId(uint256 assetType, uint256 tokenId) public view override returns (uint256) {
         require(isAssetTypeWithTokenId(assetType), "ASSET_TYPE_DOES_NOT_TAKE_TOKEN_ID");
 
         string memory prefix = isERC721(assetType) ? NFT_ASSET_ID_PREFIX : NON_MINTABLE_PREFIX;
@@ -163,8 +147,7 @@ contract TokenAssetData is MainStorage, LibConstants, MTokenAssetData {
     {
         uint256 blobHash = uint256(keccak256(mintingBlob));
         assetId =
-            (uint256(keccak256(abi.encodePacked(MINTABLE_PREFIX, assetType, blobHash))) &
-                MASK_240) |
+            (uint256(keccak256(abi.encodePacked(MINTABLE_PREFIX, assetType, blobHash))) & MASK_240) |
             MINTABLE_ASSET_ID_FLAG;
     }
 }

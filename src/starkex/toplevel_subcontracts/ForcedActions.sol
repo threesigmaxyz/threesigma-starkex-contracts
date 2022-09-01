@@ -28,13 +28,7 @@ contract ForcedActions is
         return 0;
     }
 
-    function validatedSelectors()
-        external
-        pure
-        virtual
-        override
-        returns (bytes4[] memory selectors)
-    {
+    function validatedSelectors() external pure virtual override returns (bytes4[] memory selectors) {
         uint256 len_ = 3;
         uint256 index_ = 0;
 

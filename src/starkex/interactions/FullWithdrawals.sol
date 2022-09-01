@@ -35,13 +35,7 @@ import "../../libraries/LibConstants.sol";
   cost of the request exceed 1M gas.
 
 */
-abstract contract FullWithdrawals is
-    StateRoot,
-    LibConstants,
-    MStarkExForcedActionState,
-    MFreezable,
-    MKeyGetters
-{
+abstract contract FullWithdrawals is StateRoot, LibConstants, MStarkExForcedActionState, MFreezable, MKeyGetters {
     event LogFullWithdrawalRequest(uint256 ownerKey, uint256 vaultId);
 
     function isVaultInRange(uint256 vaultId) private view returns (bool) {
@@ -55,11 +49,7 @@ abstract contract FullWithdrawals is
         return (rollupLowerBound <= vaultId && vaultId < rollupUpperBound);
     }
 
-    function fullWithdrawalRequest(uint256 ownerKey, uint256 vaultId)
-        external
-        notFrozen
-        onlyKeyOwner(ownerKey)
-    {
+    function fullWithdrawalRequest(uint256 ownerKey, uint256 vaultId) external notFrozen onlyKeyOwner(ownerKey) {
         // Verify vault ID in range.
         require(isVaultInRange(vaultId), "OUT_OF_RANGE_VAULT_ID");
 

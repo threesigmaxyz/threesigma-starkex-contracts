@@ -18,25 +18,23 @@ import "src/starkex/toplevel_subcontracts/ProxyUtils.sol";
 import "src/starkex/components/EscapeVerifier.sol";
 import "src/starkex/components/OrderRegistry.sol";
 
-
 contract DeploymentScript is Script {
-
     // Main StarkEx Exchange Dispatcher
     StarkExchange exchange;
-    
+
     // StarkEx Exchange Top Level Components
-    AllVerifiers allVerifiers;          // StarkWare_AllVerifiers_2022_2
-    TokensAndRamping tokensAndRamping;  // StarkWare_TokensAndRamping_2022_2
-    StarkExState starkExState;          // StarkWare_StarkExState_2022_4
-    ForcedActions forcedActions;        // StarkWare_ForcedActions_2022_2
-    OnchainVaults onchainVaults;        // StarkWare_OnchainVaults_2022_2
-    ProxyUtils proxyUtils;              // StarkWare_ProxyUtils_2022_2
+    AllVerifiers allVerifiers; // StarkWare_AllVerifiers_2022_2
+    TokensAndRamping tokensAndRamping; // StarkWare_TokensAndRamping_2022_2
+    StarkExState starkExState; // StarkWare_StarkExState_2022_4
+    ForcedActions forcedActions; // StarkWare_ForcedActions_2022_2
+    OnchainVaults onchainVaults; // StarkWare_OnchainVaults_2022_2
+    ProxyUtils proxyUtils; // StarkWare_ProxyUtils_2022_2
 
     // Aux Contracts
     EscapeVerifier escapeVerifier;
     OrderRegistry orderRegistry;
 
-    // Proxy Contract    
+    // Proxy Contract
     Proxy proxy;
 
     function run() external {
@@ -59,14 +57,14 @@ contract DeploymentScript is Script {
     function _deployStarkExchange() internal {
         // deploy exchange
         exchange = new StarkExchange();
-    
+
         // deploy exchange components
-        allVerifiers = new AllVerifiers();          // StarkWare_AllVerifiers_2022_2 (no init)
-        tokensAndRamping = new TokensAndRamping();  // StarkWare_TokensAndRamping_2022_2 (no init)
-        starkExState = new StarkExState();          // StarkWare_StarkExState_2022_4 (init)
-        forcedActions = new ForcedActions();        // StarkWare_ForcedActions_2022_2 (no init)
-        onchainVaults = new OnchainVaults();        // StarkWare_OnchainVaults_2022_2 (no init inconsistent impl)
-        proxyUtils = new ProxyUtils();              // StarkWare_ProxyUtils_2022_2 (no init inconsistent impl)
+        allVerifiers = new AllVerifiers(); // StarkWare_AllVerifiers_2022_2 (no init)
+        tokensAndRamping = new TokensAndRamping(); // StarkWare_TokensAndRamping_2022_2 (no init)
+        starkExState = new StarkExState(); // StarkWare_StarkExState_2022_4 (init)
+        forcedActions = new ForcedActions(); // StarkWare_ForcedActions_2022_2 (no init)
+        onchainVaults = new OnchainVaults(); // StarkWare_OnchainVaults_2022_2 (no init inconsistent impl)
+        proxyUtils = new ProxyUtils(); // StarkWare_ProxyUtils_2022_2 (no init inconsistent impl)
     }
 
     /// @dev deploy auxiliary contracts
@@ -75,7 +73,7 @@ contract DeploymentScript is Script {
         An escapeVerifier verifies that the contents of a vault belong to a certain Merkle commitment (root).
         Allows for users to withdraw from a frozen exchange.
         */
-        address[63] memory tables;  // EscapeVerifier.N_TABLES = 63
+        address[63] memory tables; // EscapeVerifier.N_TABLES = 63
         escapeVerifier = new EscapeVerifier(tables);
     }
 
@@ -107,23 +105,15 @@ contract DeploymentScript is Script {
             address(forcedActions),
             address(onchainVaults),
             address(proxyUtils),
-            address(0x0)                // TODO External initializer contract address
+            address(0x0) // TODO External initializer contract address
             // TODO starkExState init data
             // starkExState init struct contains: 2 * address + 8 * uint256 + 1 * bool = 352 bytes.
         );
 
         // add implementation to timelocked queue
-        proxy.addImplementation(
-            address(exchange),
-            initializationData,
-            false
-        );
-        // upgrade immediately since timelock delay is 0 
-        proxy.upgradeTo(
-            address(exchange),
-            initializationData,
-            false
-        );
+        proxy.addImplementation(address(exchange), initializationData, false);
+        // upgrade immediately since timelock delay is 0
+        proxy.upgradeTo(address(exchange), initializationData, false);
     }
 
     /// @dev deploy data availability committee contract

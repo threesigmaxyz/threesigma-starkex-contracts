@@ -8,14 +8,7 @@ import "../components/MainGovernance.sol";
 import "../components/Verifiers.sol";
 import "../interfaces/SubContractor.sol";
 
-contract AllVerifiers is
-    SubContractor,
-    MainGovernance,
-    Freezable,
-    ApprovalChain,
-    AvailabilityVerifiers,
-    Verifiers
-{
+contract AllVerifiers is SubContractor, MainGovernance, Freezable, ApprovalChain, AvailabilityVerifiers, Verifiers {
     function initialize(
         bytes calldata /* data */
     ) external override {

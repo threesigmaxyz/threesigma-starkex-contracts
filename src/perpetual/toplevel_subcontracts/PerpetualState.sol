@@ -44,11 +44,10 @@ contract PerpetualState is
 
         require(data.length == INITIALIZER_SIZE, "INCORRECT_INIT_DATA_SIZE_384");
 
-        (
-            address escapeVerifierAddress_,
-            uint256 initialSequenceNumber,
-            uint256[] memory initialState
-        ) = abi.decode(data, (address, uint256, uint256[]));
+        (address escapeVerifierAddress_, uint256 initialSequenceNumber, uint256[] memory initialState) = abi.decode(
+            data,
+            (address, uint256, uint256[])
+        );
 
         initGovernance();
         Configuration.initialize(PERPETUAL_CONFIGURATION_DELAY);

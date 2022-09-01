@@ -129,10 +129,7 @@ abstract contract MainDispatcherBase is IDispatcherBase, BlockDirectCall {
         // Extract & update contract addresses.
         for (uint256 nContract = 1; nContract <= nSubContracts; nContract++) {
             // Extract sub-contract address.
-            address contractAddress = abi.decode(
-                data[32 * (nContract - 1):32 * nContract],
-                (address)
-            );
+            address contractAddress = abi.decode(data[32 * (nContract - 1):32 * nContract], (address));
 
             validateSubContractIndex(nContract, contractAddress);
 
@@ -167,10 +164,7 @@ abstract contract MainDispatcherBase is IDispatcherBase, BlockDirectCall {
         // III. Loops through the subcontracts, extracts their data and calls their initializer.
         for (uint256 nContract = 1; nContract <= nSubContracts; nContract++) {
             // Extract sub-contract address.
-            address contractAddress = abi.decode(
-                data[32 * (nContract - 1):32 * nContract],
-                (address)
-            );
+            address contractAddress = abi.decode(data[32 * (nContract - 1):32 * nContract], (address));
 
             // The initializerSize is called via delegatecall, so that it can relate to the state,
             // and not only to the new contract code. (e.g. return 0 if state-intialized else 192).
@@ -202,9 +196,7 @@ abstract contract MainDispatcherBase is IDispatcherBase, BlockDirectCall {
         require(additionalDataSize == totalInitSizes, "MISMATCHING_INIT_DATA_SIZE");
     }
 
-    function callExternalInitializer(address externalInitializerAddr, bytes calldata extInitData)
-        private
-    {
+    function callExternalInitializer(address externalInitializerAddr, bytes calldata extInitData) private {
         require(externalInitializerAddr.isContract(), "NOT_A_CONTRACT");
 
         // NOLINTNEXTLINE: low-level-calls, controlled-delegatecall.

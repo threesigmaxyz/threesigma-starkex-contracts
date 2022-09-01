@@ -6,12 +6,7 @@ import "../PerpetualConstants.sol";
 import "../../interfaces/MFreezable.sol";
 import "../../interfaces/MKeyGetters.sol";
 
-abstract contract ForcedWithdrawals is
-    PerpetualConstants,
-    MForcedWithdrawalActionState,
-    MFreezable,
-    MKeyGetters
-{
+abstract contract ForcedWithdrawals is PerpetualConstants, MForcedWithdrawalActionState, MFreezable, MKeyGetters {
     event LogForcedWithdrawalRequest(uint256 starkKey, uint256 vaultId, uint256 quantizedAmount);
 
     function forcedWithdrawalRequest(
@@ -26,10 +21,7 @@ abstract contract ForcedWithdrawals is
 
         // We cannot handle two identical forced withdraw request at the same time.
         // User can either wait for pending one to be cleared, or issue one with different amount.
-        require(
-            getForcedWithdrawalRequest(starkKey, vaultId, quantizedAmount) == 0,
-            "REQUEST_ALREADY_PENDING"
-        );
+        require(getForcedWithdrawalRequest(starkKey, vaultId, quantizedAmount) == 0, "REQUEST_ALREADY_PENDING");
 
         // Start timer on escape request.
         setForcedWithdrawalRequest(starkKey, vaultId, quantizedAmount, premiumCost);

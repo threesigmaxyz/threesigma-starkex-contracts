@@ -37,20 +37,12 @@ abstract contract ApprovalChain is MainStorage, MApprovalChain, MGovernance, MFr
 
         // Verifier must have at least one fact registered before adding to chain,
         // unless it's the first verifier in the chain.
-        require(
-            list.length == 0 || IQueryableFactRegistry(entry).hasRegisteredFact(),
-            "ENTRY_NOT_ENABLED"
-        );
+        require(list.length == 0 || IQueryableFactRegistry(entry).hasRegisteredFact(), "ENTRY_NOT_ENABLED");
         chain.list.push(entry);
         emit LogRegistered(entry, identifier);
     }
 
-    function findEntry(address[] storage list, address entry)
-        internal
-        view
-        override
-        returns (uint256)
-    {
+    function findEntry(address[] storage list, address entry) internal view override returns (uint256) {
         uint256 n_entries = list.length;
         for (uint256 i = 0; i < n_entries; i++) {
             if (list[i] == entry) {
@@ -61,12 +53,7 @@ abstract contract ApprovalChain is MainStorage, MApprovalChain, MGovernance, MFr
         return ENTRY_NOT_FOUND;
     }
 
-    function safeFindEntry(address[] storage list, address entry)
-        internal
-        view
-        override
-        returns (uint256 idx)
-    {
+    function safeFindEntry(address[] storage list, address entry) internal view override returns (uint256 idx) {
         idx = findEntry(list, entry);
 
         require(idx != ENTRY_NOT_FOUND, "ENTRY_DOES_NOT_EXIST");

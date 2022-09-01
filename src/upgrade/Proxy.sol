@@ -98,9 +98,7 @@ contract Proxy is ProxyStorage, ProxyGovernance, StorageSlots {
         }
 
         // NOLINTNEXTLINE: low-level-calls.
-        (bool success, bytes memory returndata) = _implementation.delegatecall(
-            abi.encodeWithSignature("isFrozen()")
-        );
+        (bool success, bytes memory returndata) = _implementation.delegatecall(abi.encodeWithSignature("isFrozen()"));
         require(success, string(returndata));
         return abi.decode(returndata, (bool));
     }
@@ -270,10 +268,7 @@ contract Proxy is ProxyStorage, ProxyGovernance, StorageSlots {
         require(newImplementation.isContract(), "ADDRESS_NOT_CONTRACT");
 
         // On the first time an implementation is set - time-lock should not be enforced.
-        require(
-            activationTime <= block.timestamp || implementation() == address(0x0),
-            "UPGRADE_NOT_ENABLED_YET"
-        );
+        require(activationTime <= block.timestamp || implementation() == address(0x0), "UPGRADE_NOT_ENABLED_YET");
 
         setImplementation(newImplementation);
 
@@ -285,9 +280,7 @@ contract Proxy is ProxyStorage, ProxyGovernance, StorageSlots {
 
         // Verify that the new implementation is not frozen post initialization.
         // NOLINTNEXTLINE: low-level-calls controlled-delegatecall.
-        (success, returndata) = newImplementation.delegatecall(
-            abi.encodeWithSignature("isFrozen()")
-        );
+        (success, returndata) = newImplementation.delegatecall(abi.encodeWithSignature("isFrozen()"));
         require(success, "CALL_TO_ISFROZEN_REVERTED");
         require(!abi.decode(returndata, (bool)), "NEW_IMPLEMENTATION_FROZEN");
 

@@ -63,9 +63,7 @@ abstract contract ProxySupport is Governance, BlockDirectCall, ContractInitializ
         }
     }
 
-    function callExternalInitializer(address externalInitializerAddr, bytes calldata eicData)
-        private
-    {
+    function callExternalInitializer(address externalInitializerAddr, bytes calldata eicData) private {
         require(externalInitializerAddr.isContract(), "EIC_NOT_A_CONTRACT");
 
         // NOLINTNEXTLINE: low-level-calls, controlled-delegatecall.

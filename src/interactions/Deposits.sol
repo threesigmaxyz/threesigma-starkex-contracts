@@ -161,9 +161,7 @@ abstract contract Deposits is
         pendingDeposits[starkKey][assetId][vaultId] = vaultBalance;
 
         // Disable the cancellationRequest timeout when users deposit into their own account.
-        if (
-            isMsgSenderKeyOwner(starkKey) && cancellationRequests[starkKey][assetId][vaultId] != 0
-        ) {
+        if (isMsgSenderKeyOwner(starkKey) && cancellationRequests[starkKey][assetId][vaultId] != 0) {
             delete cancellationRequests[starkKey][assetId][vaultId];
         }
 
@@ -284,8 +282,7 @@ abstract contract Deposits is
         uint256 vaultId
     )
         external
-        onlyKeyOwner(starkKey)
-    // No notFrozen modifier: This function can always be used, even when frozen.
+        onlyKeyOwner(starkKey) // No notFrozen modifier: This function can always be used, even when frozen.
     {
         // Start the timeout.
         cancellationRequests[starkKey][assetId][vaultId] = block.timestamp;
@@ -321,8 +318,7 @@ abstract contract Deposits is
         uint256 vaultId
     )
         external
-        onlyKeyOwner(starkKey)
-    // No notFrozen modifier: This function can always be used, even when frozen.
+        onlyKeyOwner(starkKey) // No notFrozen modifier: This function can always be used, even when frozen.
     {
         require(isFungibleAssetType(assetType), "NON_FUNGIBLE_ASSET_TYPE");
 
@@ -350,8 +346,7 @@ abstract contract Deposits is
         uint256 vaultId
     )
         public
-        onlyKeyOwner(starkKey)
-    // No notFrozen modifier: This function can always be used, even when frozen.
+        onlyKeyOwner(starkKey) // No notFrozen modifier: This function can always be used, even when frozen.
     {
         require(isAssetTypeWithTokenId(assetType), "INVALID_ASSET_TYPE");
 
@@ -386,8 +381,7 @@ abstract contract Deposits is
         uint256 tokenId
     )
         external
-        onlyKeyOwner(starkKey)
-    // No notFrozen modifier: This function can always be used, even when frozen.
+        onlyKeyOwner(starkKey) // No notFrozen modifier: This function can always be used, even when frozen.
     {
         depositWithTokenIdReclaim(starkKey, assetType, tokenId, vaultId);
     }

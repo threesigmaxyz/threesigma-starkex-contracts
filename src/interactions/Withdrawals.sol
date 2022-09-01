@@ -91,11 +91,7 @@ abstract contract Withdrawals is
         uint256 assetId
     );
 
-    function getWithdrawalBalance(uint256 ownerKey, uint256 assetId)
-        external
-        view
-        returns (uint256)
-    {
+    function getWithdrawalBalance(uint256 ownerKey, uint256 assetId) external view returns (uint256) {
         uint256 presumedAssetType = assetId;
         return fromQuantized(presumedAssetType, pendingWithdrawals[ownerKey][assetId]);
     }

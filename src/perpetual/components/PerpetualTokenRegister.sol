@@ -33,10 +33,7 @@ abstract contract PerpetualTokenRegister is PerpetualStorage, TokenRegister {
         return systemAssetType;
     }
 
-    function registerSystemAssetType(uint256 assetType, bytes calldata assetInfo)
-        external
-        onlyTokensAdmin
-    {
+    function registerSystemAssetType(uint256 assetType, bytes calldata assetInfo) external onlyTokensAdmin {
         require(systemAssetType == uint256(0), "SYSTEM_ASSET_TYPE_ALREADY_SET");
         systemAssetType = assetType;
         super.registerToken(assetType, assetInfo, 1);

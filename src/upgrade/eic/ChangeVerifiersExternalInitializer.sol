@@ -30,12 +30,10 @@ contract ChangeVerifiersExternalInitializer is ExternalInitializer, MainStorage,
         bytes32 availabilityVerifierIdHash;
 
         // Extract sub-contract address and hash of verifierId.
-        (
-            newVerifierAddress,
-            verifierIdHash,
-            newAvailabilityVerifierAddress,
-            availabilityVerifierIdHash
-        ) = abi.decode(data, (address, bytes32, address, bytes32));
+        (newVerifierAddress, verifierIdHash, newAvailabilityVerifierAddress, availabilityVerifierIdHash) = abi.decode(
+            data,
+            (address, bytes32, address, bytes32)
+        );
 
         // Flush the entire verifiers list.
         delete verifiersChain.list;

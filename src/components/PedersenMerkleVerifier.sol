@@ -170,16 +170,7 @@ contract PedersenMerkleVerifier {
             } lt(i, 63) {
                 i := add(i, 1)
             } {
-                if iszero(
-                    staticcall(
-                        gas(),
-                        sload(i),
-                        add(proof, i),
-                        rowSize,
-                        add(table, mul(i, rowSize)),
-                        rowSize
-                    )
-                ) {
+                if iszero(staticcall(gas(), sload(i), add(proof, i), rowSize, add(table, mul(i, rowSize)), rowSize)) {
                     returndatacopy(0, 0, returndatasize())
                     revert(0, returndatasize())
                 }
