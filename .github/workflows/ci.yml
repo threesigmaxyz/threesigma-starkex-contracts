@@ -68,6 +68,7 @@ jobs:
           echo "✅ Passed" >> $GITHUB_STEP_SUMMARY
 
   container:
+    name: Build and Publish Docker Image
     runs-on: ubuntu-latest
     # https://docs.github.com/en/actions/reference/authentication-in-a-workflow
     permissions:
