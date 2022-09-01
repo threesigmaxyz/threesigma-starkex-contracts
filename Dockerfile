@@ -8,4 +8,4 @@ COPY script script
 
 RUN forge build
 
-ENTRYPOINT ["anvil", "-m", "test test test test test test test test test test test junk", "--block-time", "10"]
+ENTRYPOINT ["anvil", "-m", "test test test test test test test test test test test junk", "--block-time", "10", "--host", "0.0.0.0"]
