@@ -18,6 +18,9 @@ import "src/starkex/toplevel_subcontracts/ProxyUtils.sol";
 import "src/starkex/components/EscapeVerifier.sol";
 import "src/starkex/components/OrderRegistry.sol";
 
+import "src/tokens/Mintable/MintableERC20Asset.sol";
+import "src/tokens/Mintable/MintableERC721Asset.sol";
+
 contract DeploymentScript is Script {
     // Main StarkEx Exchange Dispatcher
     StarkExchange exchange;
@@ -37,6 +40,10 @@ contract DeploymentScript is Script {
     // Proxy Contract
     Proxy proxy;
 
+    // Tokens
+    MintableERC20Asset mintableErc20Asset;
+    MintableERC721Asset mintableErc721Asset;
+
     function run() external {
         // record calls and contract creations made by our script contract
         vm.startBroadcast();
@@ -48,6 +55,10 @@ contract DeploymentScript is Script {
         _initProxy();
 
         // TODO _deployDataAvailabilityCommittee();
+
+        // deploy token contracts
+        _deployMintableErc20Contracts();
+        _deployMintableErc721Contracts();
 
         // stop recording calls
         vm.stopBroadcast();
@@ -126,5 +137,27 @@ contract DeploymentScript is Script {
 
         // deploy committee contract
         Committee committee = new Committee(committeeMembers, 2);
+    }
+
+    /// @dev deploy Mintable Erc20 Tokens contracts
+    function _deployMintableErc20Contracts() internal {
+        // TODO Any way of not having these addresses hardcoded? Maybe only deploying the contracts after having the chained deployed with anvil
+        address owner = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+        string memory name = "Three Sigma MERC20 Token";
+        string memory symbol = "TSTME20";
+        // TODO The operator address is not the same as the StarkExContractAddress right? We need to deploy the operator contract as well right?
+        address operator = 0x5FbDB2315678afecb367f032d93F642f64180aa3;
+
+        mintableErc20Asset = new MintableERC20Asset(owner, name, symbol, operator);
+    }
+
+    /// @dev deploy Mintable Erc721 Tokens contracts
+    function _deployMintableErc721Contracts() internal {
+        address owner = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+        string memory name = "Three Sigma MERC721 Token";
+        string memory symbol = "TSTME721";
+        address operator = 0x5FbDB2315678afecb367f032d93F642f64180aa3;
+
+        mintableErc721Asset = new MintableERC721Asset(owner, name, symbol, operator);
     }
 }
