@@ -29,21 +29,42 @@ make all
 ```
 
 ## Testing
-
 To run all tests execute the following commad:
-
 ```
 make test
 ```
 
 Alternatively, you can run specific tests as detailed in this [guide](https://book.getfoundry.sh/forge/tests).
 
-# Deployment
+## Deployment
 
-The deployment script performs the following actions:
+The deployment scripts perform the following actions:
 
-- Deploys the StarkEx core contracts;
-- Deploy and initialize the main proxy contract;
+- Deploys a proxy contract;
+- Deploys all StarkEx core contracts + peripherals;
+- Proxy setup + implementation init;
+
+### Setup
+Prior to deployment you must configure the following variables in the `.env` file:
+
+- `ANVIL_MNEMONIC`: The mnemonic for Anvil wallet initialization.
+- `DEPLOYER_PRIVATE_KEY`: The private key for the deployer wallet (should be funded by Anvil).
+
+### Run Anvil
+To start a local blockchain, with a determined private key, run:
+
+```sh
+make anvil blockTime=10
+```
+
+The `blockTime` parameter sets the mining interval, which means that a new block will be generated in a given period of time selected (in seconds).
+
+### Deploy Contracts
+Afterwards, you can deploy all contracts via:
+
+```sh
+make deploy
+```
 
 ## Local Deployment
 
@@ -58,12 +79,12 @@ make anvil
 Afterwards, you can deploy to it via:
 
 ```bash
-make deplo blockTime=10
+make deploy blockTime=10
 ```
 
 The `blockTime` parameter sets the mining interval, which means that a new block will be generated in a given period of time selected (in seconds).
 
-# Security
+## Security
 
 This repository includes a Slither configuration, a popular static analysis tool from [Trail of Bits](https://www.trailofbits.com/). To use Slither, you'll first need to [install Python](https://www.python.org/downloads/) and [install Slither](https://github.com/crytic/slither#how-to-install).
 
@@ -75,12 +96,6 @@ make slither
 
 And analyse the output of the tool.
 
-# Contributing
-
-Contributions are welcome, and [Three Sigma](https://threesigma.xyz) is always hiring!
-
-If you are interested in joining our team you can apply [here](mailto:info@threesigma.xyz).
-
-## License
+# License
 
 [MIT](./LICENSE.md) © Three Sigma
