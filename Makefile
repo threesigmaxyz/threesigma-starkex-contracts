@@ -1,30 +1,33 @@
 -include .env
 
-all: clean remove install update build
+all: clean remove install build
 
 # Clean the repo
-clean :; @forge clean && export FOUNDRY_PROFILE=modules && forge clean
+clean :;
+	@FOUNDRY_PROFILE=default forge clean && export FOUNDRY_PROFILE=modules && forge clean
 
 # Remove modules
 remove :;
-	rm -rf .gitmodules && \
+	@rm -rf .gitmodules && \
 	rm -rf .git/modules/* && \
-	rm -rf lib && touch .gitmodules && \
-	git add . && \
-	git commit -m "chore: modules"
+	rm -rf lib && touch .gitmodules
 
 # Install dependencies
-install:;
-	forge install foundry-rs/forge-std && \
-	forge install openzeppelin/openzeppelin-contracts
+install: install-dex install-modules
 
-# Update dependencies
-update :; forge update
+install-dex:;
+	@export FOUNDRY_PROFILE=default && \
+	forge install foundry-rs/forge-std@2a2ce36 --no-commit
+
+install-modules:;
+	@export FOUNDRY_PROFILE=modules && \
+	forge install foundry-rs/forge-std --no-commit && \
+	forge install openzeppelin/openzeppelin-contracts --no-commit
 
 # Build the project
 build: build-dex build-modules
 
-build-dex :; forge build
+build-dex :; export FOUNDRY_PROFILE=default && forge build
 
 build-modules:; export FOUNDRY_PROFILE=modules && forge build
 
@@ -49,7 +52,8 @@ deploy: deploy-dex deploy-modules
 
 # Deploy DEX contracts
 # This is the private key of account from the mnemonic from the "make anvil" command
-deploy-dex :; @forge script script/scalable-dex/DeployStarkEx.s.sol:DeployStarkExScript \
+deploy-dex :; @export FOUNDRY_PROFILE=default && \
+	forge script script/scalable-dex/DeployStarkEx.s.sol:DeployStarkExScript \
 	--rpc-url http://localhost:8545 \
 	--private-key ${DEPLOYER_PRIVATE_KEY} \
 	--broadcast

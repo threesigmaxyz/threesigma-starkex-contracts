@@ -1,7 +1,8 @@
 {
   "filter_paths": "lib",
   "solc_remaps": [
-    "@forge-std/=lib/forge-std/src/",
-    "@openzeppelin=lib/openzeppelin-contracts"
+    "@forge-std-legacy/=lib/scalable-dex/forge-std/src/",
+    "@forge-std/=lib/modules/forge-std/src/",
+    "@openzeppelin=lib/modules/openzeppelin-contracts"
   ]
 }
