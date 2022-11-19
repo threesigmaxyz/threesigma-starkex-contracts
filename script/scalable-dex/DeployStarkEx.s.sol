@@ -115,12 +115,16 @@ contract DeployStarkExScript is Script {
 
     /// @dev deploy data availabigetStateUpdateInitData()lity committee contract
     function _deployDataAvailabilityCommittee() internal returns (address) {
-        // load DA settings from env
-        address[] memory committeeMembers_ = vm.envAddress("STARKEX_DA_COMMITTEE", ",");
+        // load DA threshold from env
         uint256 numSignaturesRequired_ = vm.envUint("STARKEX_DA_THRESHOLD");
+        if (numSignaturesRequired_ == 0) {
+            return address(0);
+        }
+
+        // load DA members from env
+        address[] memory committeeMembers_ = vm.envAddress("STARKEX_DA_COMMITTEE", ",");
 
         // validate settings
-        require(numSignaturesRequired_ > 0, "DDAC:THRESHOLD:OUT_OF_BOUNDS");
         require(committeeMembers_.length >= numSignaturesRequired_, "STARKEX:DDAC:OUT_OF_BOUNDS");
 
         // deploy committee contract
