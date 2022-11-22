@@ -1,2 +1,3 @@
-@forge-std/=lib/forge-std/src/
-@openzeppelin=lib/openzeppelin-contracts/contracts
+@forge-std-legacy/=lib/scalable-dex/forge-std/src/
+@openzeppelin=lib/modules/openzeppelin-contracts/contracts
+@forge-std/=lib/modules/forge-std/src/

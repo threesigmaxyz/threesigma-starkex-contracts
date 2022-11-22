@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.6.12;
 
-import { Script } from "@forge-std/Script.sol";
+import { Script }              from "@forge-std-legacy/Script.sol";
+import { console2 as Console } from "@forge-std-legacy/console2.sol";
 
 import { Committee }        from "src/scalable-dex/committee/Committee.sol";
+import { TokenRegister }    from "src/scalable-dex/components/TokenRegister.sol";
 import { StarkExchange }    from "src/scalable-dex/starkex/StarkExchange.sol";
 import { EscapeVerifier }   from "src/scalable-dex/starkex/components/EscapeVerifier.sol";
 import { OrderRegistry }    from "src/scalable-dex/starkex/components/OrderRegistry.sol";
@@ -15,7 +17,22 @@ import { ProxyUtils }       from "src/scalable-dex/starkex/toplevel_subcontracts
 import { AllVerifiers }     from "src/scalable-dex/toplevel_subcontracts/AllVerifiers.sol";
 import { Proxy }            from "src/scalable-dex/upgrade/Proxy.sol";
 
-contract DeployStarkExScript is Script {
+contract DeployStarkExScript is Script {  
+
+    string constant STARKEX_SEQUENCE_NUMBER = "STARKEX_SEQUENCE_NUMBER";
+    string constant STARKEX_VALIDIUM_VAULT_ROOT = "STARKEX_VALIDIUM_VAULT_ROOT";
+    string constant STARKEX_ROLLUP_VAULT_ROOT = "STARKEX_ROLLUP_VAULT_ROOT";
+    string constant STARKEX_ORDER_ROOT = "STARKEX_ORDER_ROOT";
+    string constant STARKEX_VALIDIUM_TREE_HEIGHT = "STARKEX_VALIDIUM_TREE_HEIGHT";
+    string constant STARKEX_ROLLUP_TREE_HEIGHT = "STARKEX_ROLLUP_TREE_HEIGHT";
+    string constant STARKEX_ORDER_TREE_HEIGHT = "STARKEX_ORDER_TREE_HEIGHT";
+    string constant STARKEX_STRICT_VAULT_BALANCE_POLICY = "STARKEX_STRICT_VAULT_BALANCE_POLICY";
+
+    string constant STARKEX_TOKEN_ADMIN = "STARKEX_TOKEN_ADMIN";
+
+    EscapeVerifier escapeVerifier;
+    OrderRegistry orderRegistry;
+
     function run() external {
         // record calls and contract creations made by our script contract
         vm.startBroadcast();
@@ -45,46 +62,94 @@ contract DeployStarkExScript is Script {
 
         // deploy auxiliary contracts
         address[63] memory tables; // EscapeVerifier.N_TABLES = 63
-        EscapeVerifier escapeVerifier = new EscapeVerifier(tables);
+        escapeVerifier = new EscapeVerifier(tables);
+        orderRegistry = new OrderRegistry();
 
         /******************************************************************************************************************************/
         /*** Configure DEX                                                                                                          ***/
         /******************************************************************************************************************************/
 
-        // configure implementation
-        bytes memory initializationData = abi.encode(
-            address(allVerifiers),
-            address(tokensAndRamping),
-            address(starkExState),
-            address(forcedActions),
-            address(onchainVaults),
-            address(proxyUtils),
-            address(0x0) // TODO External initializer contract address
-            // TODO starkExState init data
-            // starkExState init struct contains: 2 * address + 8 * uint256 + 1 * bool = 352 bytes.
-        );
+        {
+            // get state root initialization data
+            bytes memory stateRootInitializationData_ = getStateUpdateInitData(
+                address(escapeVerifier), address(orderRegistry));
 
-        // add implementation to timelocked queue
-        proxy.addImplementation(address(exchange), initializationData, false);
-        // upgrade immediately since timelock delay is 0
-        proxy.upgradeTo(address(exchange), initializationData, false);
+            // configure implementation
+            bytes memory initializationData = abi.encode(
+                address(allVerifiers),
+                address(tokensAndRamping),
+                address(starkExState),
+                address(forcedActions),
+                address(onchainVaults),
+                address(proxyUtils),
+                address(0x0) // TODO External initializer contract address
+            );
+            initializationData = abi.encodePacked(initializationData, stateRootInitializationData_);
+
+            // add implementation to timelocked queue
+            proxy.addImplementation(address(exchange), initializationData, false);
+            // upgrade immediately since timelock delay is 0
+            proxy.upgradeTo(address(exchange), initializationData, false);
+        }
+        
+
+        /******************************************************************************************************************************/
+        /*** Deploy Data Availability Committee                                                                                     ***/
+        /******************************************************************************************************************************/
+
+        _deployDataAvailabilityCommittee();
+
+        /******************************************************************************************************************************/
+        /*** Governance Operations                                                                                                  ***/
+        /******************************************************************************************************************************/
+        
+        address tokenAdmin = vm.envAddress(STARKEX_TOKEN_ADMIN);
+        if (tokenAdmin != address(0)) {
+            TokenRegister(address(proxy)).registerTokenAdmin(tokenAdmin);
+        }
+        Console.log(tokenAdmin);
 
         // stop recording calls
         vm.stopBroadcast();
     }
 
-    /*
-    TODO
-    /// @dev deploy data availability committee contract
-    function _deployDataAvailabilityCommittee() internal {
-        // list of availability committee members.
-        address[] memory committeeMembers = new address[](3);
-        committeeMembers[0] = 0xa342f5D851E866E18ff98F351f2c6637f4478dB5;
-        committeeMembers[1] = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045;
-        committeeMembers[2] = 0x19A1FCD731895cb0F2BE59f21Eabd8D1893A4DBE;
+    /// @dev deploy data availabigetStateUpdateInitData()lity committee contract
+    function _deployDataAvailabilityCommittee() internal returns (address) {
+        // load DA threshold from env
+        uint256 numSignaturesRequired_ = vm.envUint("STARKEX_DA_THRESHOLD");
+        if (numSignaturesRequired_ == 0) {
+            return address(0);
+        }
+
+        // load DA members from env
+        address[] memory committeeMembers_ = vm.envAddress("STARKEX_DA_COMMITTEE", ",");
+
+        // validate settings
+        require(committeeMembers_.length >= numSignaturesRequired_, "STARKEX:DDAC:OUT_OF_BOUNDS");
 
         // deploy committee contract
-        Committee committee = new Committee(committeeMembers, 2);
+        Committee committee = new Committee(committeeMembers_, numSignaturesRequired_);
+        
+        return address(committee);
     }
-    */
+
+    function getStateUpdateInitData(
+        address escapeVerifierAddress_,
+        address orderRegistryAddress_
+    ) private returns (bytes memory) {
+        // encode init data
+        return abi.encode(
+            1337,
+            escapeVerifierAddress_,
+            vm.envUint(STARKEX_SEQUENCE_NUMBER),
+            vm.envUint(STARKEX_VALIDIUM_VAULT_ROOT),
+            vm.envUint(STARKEX_ROLLUP_VAULT_ROOT),
+            vm.envUint(STARKEX_ORDER_ROOT),
+            vm.envUint(STARKEX_VALIDIUM_TREE_HEIGHT),
+            vm.envUint(STARKEX_ROLLUP_TREE_HEIGHT),
+            vm.envUint(STARKEX_ORDER_TREE_HEIGHT),
+            vm.envBool(STARKEX_STRICT_VAULT_BALANCE_POLICY),
+            orderRegistryAddress_
+        );
+    }
 }
