@@ -44,6 +44,7 @@ anvil :;
 		--mnemonic ${ANVIL_MNEMONIC} \
 		--accounts 1 \
 		--balance 1000000 \
+		--base-fee 0 \
 		--block-time ${blockTime} \
 		--host 0.0.0.0
 
