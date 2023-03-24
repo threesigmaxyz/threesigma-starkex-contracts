@@ -66,6 +66,10 @@ deploy-modules :; @export SCALABLE_DEX_ADDRESS=0x5fbdb2315678afecb367f032d93f642
  	forge script script/modules/DeployMintableModule.s.sol:DeployMintableModuleScript \
 	--rpc-url http://localhost:8545 \
 	--private-key ${DEPLOYER_PRIVATE_KEY} \
+	--broadcast && \
+	forge script script/modules/DeployFaucetsModule.s.sol:DeployFaucetsModuleScript \
+	--rpc-url http://localhost:8545 \
+	--private-key ${DEPLOYER_PRIVATE_KEY} \
 	--broadcast
 
 # Take chain snapshot
