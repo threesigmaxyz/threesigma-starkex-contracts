@@ -1,3 +1,4 @@
 @forge-std-legacy/=lib/scalable-dex/forge-std/src/
-@openzeppelin=lib/modules/openzeppelin-contracts/contracts
 @forge-std/=lib/modules/forge-std/src/
+@openzeppelin=lib/modules/openzeppelin-contracts/contracts
+@openzeppelin-upgradeable=lib/modules/openzeppelin-contracts-upgradeable/contracts

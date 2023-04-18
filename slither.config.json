@@ -3,6 +3,8 @@
   "solc_remaps": [
     "@forge-std-legacy/=lib/scalable-dex/forge-std/src/",
     "@forge-std/=lib/modules/forge-std/src/",
-    "@openzeppelin=lib/modules/openzeppelin-contracts"
+    "@openzeppelin=lib/modules/openzeppelin-contracts",
+    "@openzeppelin-upgradeable=lib/modules/openzeppelin-contracts-upgradeable/contracts"
+
   ]
 }

@@ -7,3 +7,7 @@
 [submodule "lib/modules/openzeppelin-contracts"]
 	path = lib/modules/openzeppelin-contracts
 	url = https://github.com/openzeppelin/openzeppelin-contracts
+[submodule "lib/modules/openzeppelin-contracts-upgradeable"]
+	path = lib/modules/openzeppelin-contracts-upgradeable
+	url = https://github.com/openzeppelin/openzeppelin-contracts-upgradeable
+	branch = master

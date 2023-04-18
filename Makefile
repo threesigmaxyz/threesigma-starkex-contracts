@@ -22,7 +22,8 @@ install-dex:;
 install-modules:;
 	@export FOUNDRY_PROFILE=modules && \
 	forge install foundry-rs/forge-std --no-commit && \
-	forge install openzeppelin/openzeppelin-contracts --no-commit
+	forge install openzeppelin/openzeppelin-contracts --no-commit && \
+	forge install openzeppelin/openzeppelin-contracts-upgradeable@master --no-commit
 
 # Build the project
 build: build-dex build-modules
@@ -61,16 +62,22 @@ deploy-dex :; @export FOUNDRY_PROFILE=default && \
 
 # Deploy mudule contracts
 # This is the private key of account from the mnemonic from the "make anvil" command
-deploy-modules :; @export SCALABLE_DEX_ADDRESS=0x5fbdb2315678afecb367f032d93f642f64180aa3 && \
+deploy-modules : deploy-mintable deploy-faucets 
+
+deploy-mintable :; @export SCALABLE_DEX_ADDRESS=0x5fbdb2315678afecb367f032d93f642f64180aa3 && \
 	export FOUNDRY_PROFILE=modules && \
- 	forge script script/modules/DeployMintableModule.s.sol:DeployMintableModuleScript \
+	forge script script/modules/DeployMintableModule.s.sol:DeployMintableModuleScript \
 	--rpc-url http://localhost:8545 \
 	--private-key ${DEPLOYER_PRIVATE_KEY} \
-	--broadcast && \
+	--broadcast
+
+deploy-faucets :; @export SCALABLE_DEX_ADDRESS=0x5fbdb2315678afecb367f032d93f642f64180aa3 && \
+	export FOUNDRY_PROFILE=modules && \
 	forge script script/modules/DeployFaucetsModule.s.sol:DeployFaucetsModuleScript \
 	--rpc-url http://localhost:8545 \
 	--private-key ${DEPLOYER_PRIVATE_KEY} \
 	--broadcast
+
 
 # Take chain snapshot
 snapshot :; forge snapshot
