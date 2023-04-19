@@ -8,20 +8,41 @@ import { Test } from "forge-std/Test.sol";
 import { IMintable } from "../../../../src/modules/mintable/core/IMintable.sol";
 import { Mintable } from "../../../../src/modules/mintable/core/Mintable.sol";
 import { ERC721Mintable } from "../../../../src/modules/mintable/erc721/ERC721Mintable.sol";
+import { ByteUtils } from "../../../../src/modules/mintable/utils/ByteUtils.sol";
 
 contract ERC721MintableTest is Test {
+    //==============================================================================//
+    //=== Events                                                                 ===//
+    //==============================================================================//
+
+    event LogMintedERC721(address indexed to_, uint256 tokenId_);
+
+    //==============================================================================//
+    //=== Constants                                                              ===//
+    //==============================================================================//
+
     string private constant NAME = "Three Sigma MERC721 Token";
     string private constant SYMBOL = "TSTME721";
     string private constant URI = "https://starkexpress.io/";
 
-    event LogMintedERC721(address indexed to_, uint256 tokenId_);
+    //==============================================================================//
+    //=== State Variables                                                        ===//
+    //==============================================================================//
 
     ERC721Mintable private _asset;
+
+    //==============================================================================//
+    //=== SetUp                                                                  ===//
+    //==============================================================================//
 
     function setUp() public {
         _asset = new ERC721Mintable();
         _asset.initialize(NAME, SYMBOL, URI, _starkEx());
     }
+
+    //==============================================================================//
+    //=== Tests                                                                  ===//
+    //==============================================================================//
 
     function test_constructor() public {
         // Assert
@@ -32,17 +53,17 @@ contract ERC721MintableTest is Test {
 
     function test_supportsInterface_success() public {
         // Arrange
-        // TODO bytes4 erc165Selector = type(IERC165).interfaceId;
-        // TODO bytes4 erc721Selector = type(IERC721Upgradeable).interfaceId;
+        bytes4 erc165Selector = type(IERC165).interfaceId;
+        bytes4 erc721Selector = type(IERC721Upgradeable).interfaceId;
         bytes4 mintableSelector = type(IMintable).interfaceId;
 
         // Act
-        // TODO bool erc165Result = _asset.supportsInterface(erc165Selector);
-        // TODO bool erc721Result = _asset.supportsInterface(erc721Selector);
+        bool erc165Result = _asset.supportsInterface(erc165Selector);
+        bool erc721Result = _asset.supportsInterface(erc721Selector);
         bool mintableResult = _asset.supportsInterface(mintableSelector);
 
         // Assert
-        assertTrue(mintableResult);
+        assertTrue(erc165Result && erc721Result && mintableResult);
     }
 
     function test_supportsInterface_interfaceNotSupported() public {
@@ -72,7 +93,7 @@ contract ERC721MintableTest is Test {
         assertEq(_asset.ownerOf(tokenId_), user_);
     }
 
-    function testMintFor_CallerNotStarkEx_RevertsWIthError() public {
+    function testMintFor_CallerNotStarkEx_RevertsWithError() public {
         // Arrange
         address user_ = vm.addr(1);
         uint256 tokenId_ = 314;
@@ -84,7 +105,7 @@ contract ERC721MintableTest is Test {
         _asset.mintFor(user_, 1, abi.encode(tokenId_));
     }
 
-    function testMintFor_InvalidQuantity_RevertsWIthError() public {
+    function testMintFor_InvalidQuantity_RevertsWithError() public {
         // Arrange
         address user_ = vm.addr(1);
         uint256 tokenId_ = 314;
@@ -95,11 +116,17 @@ contract ERC721MintableTest is Test {
         _asset.mintFor(user_, 2, abi.encode(tokenId_));
     }
 
-    function testMintFor_InvalidMintingBlob_RevertsWIthError() public {
-        // TODO
+    function testMintFor_InvalidMintingBlob_RevertsWithError() public {
+        // Arrange
+        address user_ = vm.addr(1);
+
+        // Act + Assert
+        vm.expectRevert(ByteUtils.InvalidBytesLength.selector);
+        vm.prank(_starkEx());
+        _asset.mintFor(user_, 1, abi.encodePacked(uint8(42)));
     }
 
-    function testMintFor_DuplicateId_RevertsWIthError() public {
+    function testMintFor_DuplicateId_RevertsWithError() public {
         // Arrange
         address user_ = vm.addr(1);
         uint256 tokenId_ = 314;
@@ -116,6 +143,10 @@ contract ERC721MintableTest is Test {
         assertEq(_asset.balanceOf(user_), 1);
         assertEq(_asset.ownerOf(tokenId_), user_);
     }
+
+    //==============================================================================//
+    //=== Internals                                                              ===//
+    //==============================================================================//
 
     function _starkEx() private pure returns (address) {
         return vm.addr(12_345);

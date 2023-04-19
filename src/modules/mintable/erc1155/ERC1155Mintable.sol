@@ -78,7 +78,8 @@ contract ERC1155Mintable is ERC1155Upgradeable, MintableUpgradeable, OwnableUpgr
         override(ERC1155Upgradeable, MintableUpgradeable)
         returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        return ERC1155Upgradeable.supportsInterface(interfaceId) ||
+            MintableUpgradeable.supportsInterface(interfaceId);
     }
 
     //==============================================================================//

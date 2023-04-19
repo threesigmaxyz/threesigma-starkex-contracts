@@ -71,7 +71,8 @@ contract ERC721Mintable is ERC721Upgradeable, MintableUpgradeable, OwnableUpgrad
         override(ERC721Upgradeable, MintableUpgradeable)
         returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        return ERC721Upgradeable.supportsInterface(interfaceId) ||
+            MintableUpgradeable.supportsInterface(interfaceId);
     }
 
     //==============================================================================//
