@@ -18,6 +18,10 @@ library ProxyUpgradeLib {
     /// @notice Thrown when the upgrade init call reverts.
     error InitFunctionReverted();
 
+    /// @notice Thrown when a contract address has no deployed code.
+    /// @param contract_ The contract address.
+    error ContractHasNoCode(address contract_);
+
     //==============================================================================//
     //=== Events                                                                 ===//
     //==============================================================================//
@@ -77,9 +81,9 @@ library ProxyUpgradeLib {
     /// @param calldata_ The initialization contract calldata.
     function upgradeProxy(Upgrade memory upgrade_, address init_, bytes memory calldata_) internal {
         if (upgrade_.action == ProxyUpgradeAction.Register) {
-            _registerImplementation(upgrade_.implementation, upgrade_.selectors);
+            _registerImplementation(upgrade_.implementation, upgrade_.selectors, false);
         } else if (upgrade_.action == ProxyUpgradeAction.Replace) {
-            _replaceImplementation(upgrade_.implementation, upgrade_.selectors);
+            _registerImplementation(upgrade_.implementation, upgrade_.selectors, true);
         } else if (upgrade_.action == ProxyUpgradeAction.Remove) {
             _removeImplementation(upgrade_.selectors);
         } else {
@@ -93,11 +97,12 @@ library ProxyUpgradeLib {
         if (init_ == address(0)) {
             return;
         }
-        // TODO Check if there is contract code in init_?
+
+        // Check if there is contract code in the init contract.
+        _enforceHasContractCode(init_);
 
         // Make a delgate call to the initialization contract.
         (bool success_, bytes memory error_) = init_.delegatecall(calldata_);
-        // TODO improve this.
         if (!success_) {
             if (error_.length > 0) {
                 // Bubble up error.
@@ -126,22 +131,24 @@ library ProxyUpgradeLib {
         }
     }
 
-    function _registerImplementation(address implementation_, bytes4[] memory selectors_) internal {
+    /// @notice Registers the implementation address for the given selectors in the dispatch table.
+    /// @param implementation_ The address of the contract implementation to be registered.
+    /// @param selectors_ An array of function selectors for which the implementation addresses are to be registered.
+    /// @param overwrite_ Whether to overwrite any existing implementation without requiring it to be removed first.
+    function _registerImplementation(address implementation_, bytes4[] memory selectors_, bool overwrite_) internal {
         // Load storage pointer.
         ProxyUpgradeStorage storage s = _storage();
 
-        // TODO Check if there is contract code in implementation_?
+        // Check if there is contract code in the implementation.
+        _enforceHasContractCode(implementation_);
 
         for (uint256 i_; i_ < selectors_.length;) {
             // Check collision with existing implementation.
-            address prevImpl_ = s.implementations[selectors_[i_]];
-            // TODO custom error.
-            if (address(prevImpl_) != address(0)) {
+            if (!overwrite_ && s.implementations[selectors_[i_]] != address(0)) {
                 revert ConflictingImplementation();
             }
-            require(address(prevImpl_) == address(0), "LibDiamondCut: Can't add function that already exists");
 
-            // Register implementation for selector.
+            // Set implementation for selector.
             s.implementations[selectors_[i_]] = implementation_;
 
             unchecked {
@@ -150,22 +157,8 @@ library ProxyUpgradeLib {
         }
     }
 
-    function _replaceImplementation(address implementation_, bytes4[] memory selectors_) internal {
-        // Load storage pointer.
-        ProxyUpgradeStorage storage s = _storage();
-
-        // TODO Check if there is contract code in implementation_?
-
-        for (uint256 i_; i_ < selectors_.length;) {
-            // Upgrade implementation for selector.
-            s.implementations[selectors_[i_]] = implementation_;
-
-            unchecked {
-                ++i_;
-            }
-        }
-    }
-
+    /// @notice Removes the implementation address for the given selectors from the dispatch table.
+    /// @param selectors_ An array of function selectors for which the implementation addresses are to be removed.
     function _removeImplementation(bytes4[] memory selectors_) internal {
         // Load storage pointer.
         ProxyUpgradeStorage storage s = _storage();
@@ -174,6 +167,19 @@ library ProxyUpgradeLib {
             // Remove implementation for selector.
             delete s.implementations[selectors_[i_]];
         }
-        
+    }
+
+    /// @notice Validates that the given contract address has bytecode deployed.
+    /// @dev Reverts with a `ContractHasNoCode` error if no code is deployed.
+    /// @param contract_ The address of the contract to be checked.
+    function _enforceHasContractCode(address contract_) internal view {
+        uint256 contractSize_;
+        assembly {
+            contractSize_ := extcodesize(contract_)
+        }
+
+        if (contractSize_ <= 0) {
+            revert ContractHasNoCode(contract_);
+        }
     }
 }

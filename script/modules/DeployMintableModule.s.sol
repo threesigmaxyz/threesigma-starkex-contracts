@@ -7,8 +7,8 @@ import { TokenFactory } from "../../src/modules/mintable/factory/TokenFactory.so
 import { DeployERC20Impl } from "../../src/modules/mintable/factory/implementations/erc20/DeployERC20Impl.sol";
 import { DeployERC721Impl } from "../../src/modules/mintable/factory/implementations/erc721/DeployERC721Impl.sol";
 import { DeployERC1155Impl } from "../../src/modules/mintable/factory/implementations/erc1155/DeployERC1155Impl.sol";
-import { ProxyUpgradeLib } from "../../../src/modules/mintable/proxy/libraries/ProxyUpgradeLib.sol";
-import { ProxyUpgradeImpl } from "../../../src/modules/mintable/proxy/implementations/ProxyUpgradeImpl.sol";
+import { ProxyUpgradeLib } from "../../src/modules/mintable/proxy/libraries/ProxyUpgradeLib.sol";
+import { ProxyUpgradeImpl } from "../../src/modules/mintable/proxy/implementations/ProxyUpgradeImpl.sol";
 
 contract DeployMintableModuleScript is Script {
     string public constant MERC20_NAME = "Three Sigma MERC20 Token";
