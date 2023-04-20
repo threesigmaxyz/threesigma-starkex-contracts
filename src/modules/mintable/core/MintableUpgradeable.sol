@@ -7,7 +7,7 @@ import { Initializable } from "@openzeppelin-upgradeable/proxy/utils/Initializab
 
 import { IMintable } from "./IMintable.sol";
 
-/// @title Mintable
+/// @title MintableUpgradeable
 /// @author StarkExpress Team
 /// @notice Base abstract class for mintable upgradeable StarkExpress tokens.
 abstract contract MintableUpgradeable is Initializable, ERC165, IMintable {

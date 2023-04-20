@@ -78,7 +78,7 @@ contract DeployERC1155Impl is BaseDeployerImpl, Ownable {
     /// @notice Calculate the deployment address of a `ERC1155Mintable` contract.
     /// @dev Computes the address of a clone deployed using CREATE2.
     /// @param id_ The deployment ID.
-    /// @param deploymentAddress_ The contract deployment address.
+    /// @return deploymentAddress_ The contract deployment address.
     function getERC1155DeploymentAddress(uint256 id_) external view returns (address deploymentAddress_) {
         deploymentAddress_ = Clones.predictDeterministicAddress(token, _getSalt(id_));
     }

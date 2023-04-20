@@ -42,7 +42,7 @@ abstract contract BaseDeployerImpl {
     //==============================================================================//
 
     /// @notice Calculate the contract deployment salt.
-    /// @notice The deployment ID.
+    /// @param id_ The deployment ID.
     /// @return salt_ The deployment salt.
     function _getSalt(uint256 id_) internal pure returns (bytes32 salt_) {
         salt_ = keccak256(abi.encode(id_));
