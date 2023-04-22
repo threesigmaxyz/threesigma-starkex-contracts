@@ -2,29 +2,32 @@
 pragma solidity ^0.8.0;
 
 import { IERC165 } from "@openzeppelin/interfaces/IERC165.sol";
-
-import { IMintable } from "src/modules/mintable/IMintable.sol";
-import { ERC20Mintable } from "src/modules/mintable/ERC20/ERC20Mintable.sol";
-
 import { Test } from "forge-std/Test.sol";
+
+import { IMintable } from "../../../../src/modules/mintable/core/IMintable.sol";
+import { ERC20Mintable } from "../../../../src/modules/mintable/erc20/ERC20Mintable.sol";
 
 contract ERC20MintableTest is Test {
     string private constant NAME = "Three Sigma MERC20 Token";
     string private constant SYMBOL = "TSTME20";
 
-    event Minted(address to_, uint256 quantity_);
+    error NotAuthorizedError();
+    error InvalidMintAmountError();
 
-    ERC20Mintable private asset;
+    event LogMintedERC20(address indexed to_, uint256 amount_);
+
+    ERC20Mintable private _asset;
 
     function setUp() public {
-        asset = new ERC20Mintable(NAME, SYMBOL, _starkEx());
+        _asset = new ERC20Mintable();
+        _asset.initialize(NAME, SYMBOL, _starkEx());
     }
 
     function test_constructor() public {
         // Assert
-        assertEq(asset.name(), NAME);
-        assertEq(asset.symbol(), SYMBOL);
-        assertEq(asset.starkEx(), _starkEx());
+        assertEq(_asset.name(), NAME);
+        assertEq(_asset.symbol(), SYMBOL);
+        assertEq(_asset.starkEx(), _starkEx());
     }
 
     function test_supportsInterface_success() public {
@@ -33,8 +36,8 @@ contract ERC20MintableTest is Test {
         bytes4 mintableSelector = type(IMintable).interfaceId;
 
         // Act
-        bool erc165Result = asset.supportsInterface(erc165Selector);
-        bool mintableResult = asset.supportsInterface(mintableSelector);
+        bool erc165Result = _asset.supportsInterface(erc165Selector);
+        bool mintableResult = _asset.supportsInterface(mintableSelector);
 
         // Assert
         assertTrue(erc165Result && mintableResult);
@@ -45,7 +48,7 @@ contract ERC20MintableTest is Test {
         bytes4 selector = 0x0badc0d3;
 
         // Act
-        bool result = asset.supportsInterface(selector);
+        bool result = _asset.supportsInterface(selector);
 
         // Assert
         assertFalse(result);
@@ -54,29 +57,29 @@ contract ERC20MintableTest is Test {
     function testMintFor_HappyPath_Success() public {
         // Arrange
         address user_ = vm.addr(1);
-        uint256 quantity_ = 314159265;
+        uint256 quantity_ = 314_159_265;
 
         // Act
-        vm.expectEmit(false, false, false, true);
-        emit Minted(user_, quantity_);
+        vm.expectEmit(true, false, false, true);
+        emit LogMintedERC20(user_, quantity_);
         vm.prank(_starkEx());
-        asset.mintFor(user_, quantity_, "");
+        _asset.mintFor(user_, quantity_, "");
 
         // Assert
-        assertEq(asset.totalSupply(), quantity_);
-        assertEq(asset.balanceOf(user_), quantity_);
+        assertEq(_asset.totalSupply(), quantity_);
+        assertEq(_asset.balanceOf(user_), quantity_);
     }
 
     function testMintFor_CallerNotStarkEx_RevertsWIthError() public {
         // Arrange
         address user_ = vm.addr(1);
-        uint256 quantity_ = 314159265;
+        uint256 quantity_ = 314_159_265;
         address notStarkEx_ = vm.addr(8888);
 
         // Act
-        vm.expectRevert(abi.encodePacked("Function can only be called by StarkEx"));
+        vm.expectRevert(NotAuthorizedError.selector);
         vm.prank(notStarkEx_);
-        asset.mintFor(user_, quantity_, "");
+        _asset.mintFor(user_, quantity_, "");
     }
 
     function testMintFor_InvalidQuantity_RevertsWIthError() public {
@@ -84,12 +87,12 @@ contract ERC20MintableTest is Test {
         address user_ = vm.addr(1);
 
         // Act
-        vm.expectRevert(abi.encodePacked("Invalid mint quantity"));
+        vm.expectRevert(InvalidMintAmountError.selector);
         vm.prank(_starkEx());
-        asset.mintFor(user_, 0, "");
+        _asset.mintFor(user_, 0, "");
     }
 
-    function _starkEx() private returns (address) {
-        return vm.addr(12345);
+    function _starkEx() private pure returns (address) {
+        return vm.addr(12_345);
     }
 }
